@@ -240,7 +240,7 @@ def get_tile_inds(format, device):
         return get_inverse_transform_indices(transform, _get_tile_size(format)).to(device)
 
 
-@dataclass
+@dataclass # 自动生成 __init__、__repr__、__eq__ 等方法
 class MatmulLtState:
     _tile_indices: Optional[torch.Tensor] = None
     force_no_igemmlt: bool = False

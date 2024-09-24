@@ -568,6 +568,7 @@ class LinearNF4(Linear4bit):
 
 
 class Int8Params(torch.nn.Parameter):
+    # 在 __init__ 之前被调用, 用于创建并返回类的实例
     def __new__(
         cls,
         data=None,
@@ -612,13 +613,13 @@ class Int8Params(torch.nn.Parameter):
         )
         return new_instance
 
-    @overload
+    @overload  # typing 模块提供的装饰器，用于函数重载的类型提示
     def to(
         self: T,
         device: Optional[Union[int, device]] = ...,
         dtype: Optional[Union[dtype, str]] = ...,
         non_blocking: bool = ...,
-    ) -> T: ...
+    ) -> T: ... # ...: 占位符
 
     @overload
     def to(self: T, dtype: Union[dtype, str], non_blocking: bool = ...) -> T: ...
@@ -878,7 +879,7 @@ class Linear8bitLt(nn.Linear):
     )
 
     int8_model.load_state_dict(fp16_model.state_dict())
-    int8_model = int8_model.to(0) # Quantization happens here
+    int8_model = int8_model.to(0) # 移动到 GPU 设备 0, Quantization happens here?
     ```
     """
 
@@ -916,8 +917,10 @@ class Linear8bitLt(nn.Linear):
             self.state.use_pool = True
 
         self.weight = Int8Params(self.weight.data, has_fp16_weights=has_fp16_weights, requires_grad=has_fp16_weights)
+        # 在加载模型状态字典（state dict）之前注册一个钩子（hook）函数
         self._register_load_state_dict_pre_hook(maybe_rearrange_weight)
 
+    # nn.Module.state_dict()时被调用
     def _save_to_state_dict(self, destination, prefix, keep_vars):
         super()._save_to_state_dict(destination, prefix, keep_vars)
 
@@ -952,6 +955,7 @@ class Linear8bitLt(nn.Linear):
 
                 destination[format_name] = torch.tensor(weights_format, dtype=torch.uint8)
 
+    # nn.Module.load_state_dict()时被调用
     def _load_from_state_dict(
         self,
         state_dict,

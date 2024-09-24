@@ -21,7 +21,7 @@ from tests.helpers import (
 # contributed by Alex Borzunov, see:
 # https://github.com/bigscience-workshop/petals/blob/main/tests/test_linear8bitlt.py
 
-
+# skip test if condition is TRUE
 @pytest.mark.skipif(
     not torch.cuda.is_available() or torch.cuda.get_device_capability() < (7, 5),
     reason="this test requires a turing-generation or newer GPU, see bitsandbytes docs",
@@ -39,7 +39,8 @@ def test_layout_exact_match():
         assert restored_x.is_contiguous()
         assert torch.all(torch.eq(restored_x, x))
 
-
+# i: Integer
+# lt: Low Precision Tiles
 def test_linear_no_igemmlt():
     linear = torch.nn.Linear(1024, 3072)
     x = torch.randn(3, 1024, dtype=torch.half)
@@ -75,7 +76,7 @@ def test_linear_no_igemmlt():
     assert linear_custom.state.CB is not None
     assert linear_custom.state.CxB is None
 
-
+# 测试下面的参数组合
 @pytest.mark.parametrize("has_fp16_weights", TRUE_FALSE, ids=id_formatter("has_fp16_weights"))
 @pytest.mark.parametrize("serialize_before_forward", TRUE_FALSE, ids=id_formatter("serialize_before_forward"))
 @pytest.mark.parametrize("deserialize_before_cuda", TRUE_FALSE, ids=id_formatter("deserialize_before_cuda"))
@@ -180,7 +181,7 @@ def test_linear_serialization(
     assert torch.allclose(fx_first, fx_third, atol=1e-5)
     assert torch.allclose(x_first.grad, x_third.grad, atol=1e-5)
 
-
+# Fixtures are functions that set up a certain environment or state for your tests, providing a way to create reusable test setups and teardowns.
 @pytest.fixture
 def linear8bit(requires_cuda):
     linear = torch.nn.Linear(32, 96)
