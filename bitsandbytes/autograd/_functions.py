@@ -209,7 +209,7 @@ class MatMul8bit(torch.autograd.Function):
 
         return grad_A, grad_B, None, None, None
 
-
+# 调用MatMul8bit.forward()
 mm_cublas = MatMul8bit.apply
 bmm_cublas = MatMul8bit.apply
 matmul_cublas = MatMul8bit.apply
@@ -263,7 +263,7 @@ class MatmulLtState:
     has_fp16_weights = True
     memory_efficient_backward = False
     use_pool = False
-    formatB = F.get_special_format_str()
+    formatB = F.get_special_format_str()  # GPU Architecture
 
     def reset_grads(self):
         self.CB = None
@@ -289,9 +289,10 @@ class MatMul8bitLt(torch.autograd.Function):
     @staticmethod
     def forward(ctx, A, B, out=None, bias=None, state=MatmulLtState):
         using_igemmlt = supports_igemmlt(A.device) and not state.force_no_igemmlt
+        
         # default of pytorch behavior if inputs are empty
         ctx.is_empty = False
-        if prod(A.shape) == 0:
+        if prod(A.shape) == 0: # 计算张量 A 的所有维度大小的乘积
             ctx.is_empty = True
             ctx.A = A
             ctx.B = B

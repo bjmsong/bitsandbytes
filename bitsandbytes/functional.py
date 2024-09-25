@@ -2445,7 +2445,9 @@ def get_colrow_absmax(A, row_stats=None, col_stats=None, nnz_block_ptr=None, thr
     else:
         rows = A.shape[0]
 
+    # 将 cols 分块，每个块的大小为 256 列
     col_tiles = (cols + 255) // 256
+    # 将行数向上取整为 16 的倍数
     tiled_rows = ((rows + 15) // 16) * 16
     if row_stats is None:
         row_stats = torch.empty((rows,), dtype=torch.float32, device=device).fill_(-50000.0)

@@ -22,6 +22,8 @@ project(bitsandbytes LANGUAGES CXX)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
+message(STATUS "CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 # Define included source files
 set(CPP_FILES csrc/common.cpp csrc/cpu_ops.cpp csrc/pythonInterface.cpp)
@@ -64,6 +66,10 @@ endif()
 
 
 if(BUILD_CUDA)
+    if(${CMAKE_DEBUG_CUDA} STREQUAL "ON")
+        set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -g -G")
+    endif()
+    
     # NVCC normally will only work with MSVC up to 1939. VS2022 17.10+ starts using versions 1940+.
     # Workaround: use --allow-unsupported-compiler
     # This needs to be added *before* we try to enable the CUDA language so CMake's compiler check passes.
@@ -127,7 +133,7 @@ if(BUILD_CUDA)
         endif()
     endif()
 
-    string(APPEND CMAKE_CUDA_FLAGS " --use_fast_math")
+    # string(APPEND CMAKE_CUDA_FLAGS " --use_fast_math")
 
     if(PTXAS_VERBOSE)
         # Verbose? Outputs register usage information, and other things...
@@ -241,3 +247,6 @@ if(MSVC)
 endif()
 
 set_target_properties(bitsandbytes PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bitsandbytes")
+
+add_executable(main csrc/main.cpp)
+target_link_libraries(main bitsandbytes)

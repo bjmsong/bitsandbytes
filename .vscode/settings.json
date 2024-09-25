@@ -1,7 +1,15 @@
 {
-    "ruff.fixAll": true,
-    "ruff.lint.run": "onType",
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "always"
-    }
+    "files.associations":{"*.cu":"cpp"},
+    "clangd.fallbackFlags": [
+        "-std=c++11",
+        "-I${workspaceFolder}/csrc",
+        "-I/usr/local/cuda/include",
+        "-I/usr/include/c++/11",
+        "-I/usr/lib/gcc/x86_64-linux-gnu/11/include",
+        "-I/root/miniconda3/lib/python3.12/site-packages/torch/include",
+        "-I/root/miniconda3/lib/python3.12/site-packages/torch/include/torch/csrc/api/include",
+        "-I/miniconda3/lib/python3.12/site-packages/nvidia/cuda_runtime/include",
+        "-I/root/miniconda3/include/python3.12",
+        "--gcc-toolchain=/usr/bin/gcc"
+      ]
 }

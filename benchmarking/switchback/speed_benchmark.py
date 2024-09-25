@@ -58,6 +58,7 @@ if __name__ == "__main__":
                 dim_out = round(dim_out)
 
                 # simulate forward pass
+                # x * w^T = g
                 x = torch.randn(batch_size, dim_in, dtype=torch.float16).cuda()
                 g = torch.randn(batch_size, dim_out, dtype=torch.float16).cuda()
                 w = torch.randn(dim_out, dim_in, dtype=torch.float16).cuda()
@@ -66,9 +67,9 @@ if __name__ == "__main__":
                 g_int8 = g.clone().to(torch.int8)
                 w_int8 = w.clone().to(torch.int8)
                 wt_int8 = w.t().contiguous().clone().to(torch.int8)
-                state_x_rowwise = x.max(dim=1)[0]
+                state_x_rowwise = x.max(dim=1)[0]   # max value by row
                 state_g_rowwise = g.max(dim=1)[0]
-                state_w_columnwise = w.max(dim=0)[0]
+                state_w_columnwise = w.max(dim=0)[0] # max value by column
                 state_w_rowwise = w.max(dim=1)[0]
                 state_w_global = w.max()
 
@@ -156,5 +157,5 @@ if __name__ == "__main__":
                 info_json = json.dumps(info)
 
                 # TODO: change this to what you want.
-                with open("speed_benchmark/info.jsonl", "a") as file:
+                with open("info.jsonl", "a") as file:
                     file.write(info_json + "\n")
