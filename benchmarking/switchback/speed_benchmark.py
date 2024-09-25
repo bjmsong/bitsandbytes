@@ -46,7 +46,7 @@ if __name__ == "__main__":
             # switch switches dim_in and dim_out
             for switch in [False, True]:
                 # hparams
-                repeat = 64
+                repeat = 1 # 64
                 batch_size = batch_size
                 dim_out = dim * wm
                 dim_in = dim

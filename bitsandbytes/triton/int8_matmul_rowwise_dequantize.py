@@ -11,6 +11,9 @@ else:
     import triton.language as tl
     from triton.ops.matmul_perf_model import early_config_prune, estimate_matmul_time
 
+    import os
+    os.environ["TRITON_INTERPRET"]= "1"
+
     # This is a matmul kernel based on triton.ops.matmul
     # It is modified to support rowwise quantized input and columnwise quantized weight
     # It's purpose is fused matmul then dequantize
@@ -181,6 +184,7 @@ else:
         # accumulator types
         ACC_TYPE = tl.float32  # if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
         # launch int8_matmul_rowwise_dequantize kernel
+        # 1 blcok process 1 output tile
         grid = lambda META: (triton.cdiv(M, META["BLOCK_M"]) * triton.cdiv(N, META["BLOCK_N"]), META["SPLIT_K"])
         _int8_matmul_rowwise_dequantize[grid](
             a,
