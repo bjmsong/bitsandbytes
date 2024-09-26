@@ -11,8 +11,8 @@ else:
     import triton.language as tl
     from triton.ops.matmul_perf_model import early_config_prune, estimate_matmul_time
 
-    import os
-    os.environ["TRITON_INTERPRET"]= "1"
+    # import os
+    # os.environ["TRITON_INTERPRET"]= "1"
 
     # This is a matmul kernel based on triton.ops.matmul
     # It is modified to support rowwise quantized input and columnwise quantized weight

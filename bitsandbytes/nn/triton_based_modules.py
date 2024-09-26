@@ -223,7 +223,7 @@ class SwitchBackLinear(nn.Linear):
                     -1,
                 )
 
-
+# partial：创建一个新的可调用对象（函数或类），该对象将某些参数预先设置为固定值
 SwitchBackLinearGlobal = partial(SwitchBackLinear, vector_wise_quantization=False)
 SwitchBackLinearGlobalMemEfficient = partial(SwitchBackLinear, vector_wise_quantization=False, mem_efficient=True)
 SwitchBackLinearVectorwise = partial(SwitchBackLinear, vector_wise_quantization=True)
