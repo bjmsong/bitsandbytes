@@ -121,10 +121,11 @@ else:
         # do matrix multiplication
         rm = pid_m * BLOCK_M + tl.arange(0, BLOCK_M)
         rn = pid_n * BLOCK_N + tl.arange(0, BLOCK_N)
+        # tl.max_contiguous: Let the compiler know that the value first values in input are contiguous.
         ram = tl.max_contiguous(tl.multiple_of(rm % M, BLOCK_M), BLOCK_M)
         rbn = tl.max_contiguous(tl.multiple_of(rn % N, BLOCK_N), BLOCK_N)
         rk = pid_z * BLOCK_K + tl.arange(0, BLOCK_K)
-        # pointers
+        # 2-D pointers
         A = A + (ram[:, None] * stride_am + rk[None, :] * stride_ak)
         B = B + (rk[:, None] * stride_bk + rbn[None, :] * stride_bn)
 
@@ -162,7 +163,7 @@ else:
         if SPLIT_K == 1:
             tl.store(C, acc, mask=mask)
         else:
-            tl.atomic_add(C, acc, mask=mask)
+            tl.atomic_add(C, acc, mask=mask)  # avoid data race
 
     def int8_matmul_rowwise_dequantize(a, b, state_x, state_w, bias):
         divfactor = 1.0 / (127.0 * 127.0)
@@ -184,7 +185,8 @@ else:
         # accumulator types
         ACC_TYPE = tl.float32  # if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
         # launch int8_matmul_rowwise_dequantize kernel
-        # 1 blcok process 1 output tile
+        # SPLIT_K blocks process 1 output tile
+        # if k dimension is large, use serveral blocks to process together
         grid = lambda META: (triton.cdiv(M, META["BLOCK_M"]) * triton.cdiv(N, META["BLOCK_N"]), META["SPLIT_K"])
         _int8_matmul_rowwise_dequantize[grid](
             a,

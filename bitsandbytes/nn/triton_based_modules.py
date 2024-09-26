@@ -79,7 +79,8 @@ class _switchback_vectorrize(torch.autograd.Function):
 
         # matmult, fused dequant and add bias
         # call kernel which expects rowwise quantized X and W
-        return int8_matmul_rowwise_dequantize(X_int8, W_int8.t(), state_X, state_W, bias).view(*X_3D.size()[:-1], -1)
+        output = int8_matmul_rowwise_dequantize(X_int8, W_int8.t(), state_X, state_W, bias)
+        return output.view(*X_3D.size()[:-1], -1)
 
     @staticmethod
     def backward(ctx, G_3D):
@@ -205,6 +206,7 @@ class SwitchBackLinear(nn.Linear):
             return self._fn.apply(x, self.weight, self.bias)
         else:
             # If it hasn't been "prepared for eval", run the standard forward pass.
+            # 对象 self 是否具有名为 W_int8 的属性
             if not hasattr(self, "W_int8"):
                 return self._fn.apply(x, self.weight, self.bias)
 

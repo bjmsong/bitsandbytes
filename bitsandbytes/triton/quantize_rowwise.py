@@ -4,9 +4,6 @@ import torch
 
 from bitsandbytes.triton.triton_utils import is_triton_available
 
-# import os
-# os.environ["TRITON_INTERPRET"]= "1"
-
 if not is_triton_available():
 
     def quantize_rowwise(x: torch.Tensor):
@@ -14,6 +11,9 @@ if not is_triton_available():
 else:
     import triton
     import triton.language as tl
+
+    # import os
+    # os.environ["TRITON_INTERPRET"]= "1"
 
     # rowwise quantize
 
