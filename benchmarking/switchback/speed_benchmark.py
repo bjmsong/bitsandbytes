@@ -46,7 +46,7 @@ if __name__ == "__main__":
             # switch switches dim_in and dim_out
             for switch in [False, True]:
                 # hparams
-                repeat = 1 # 64
+                repeat = 10 # 64
                 batch_size = batch_size
                 dim_out = dim * wm
                 dim_in = dim
@@ -67,9 +67,9 @@ if __name__ == "__main__":
                 g_int8 = g.clone().to(torch.int8)
                 w_int8 = w.clone().to(torch.int8)
                 wt_int8 = w.t().contiguous().clone().to(torch.int8)
-                state_x_rowwise = x.max(dim=1)[0]   # max value by row
+                state_x_rowwise = x.max(dim=1)[0]   # max value by row (batch_size)
                 state_g_rowwise = g.max(dim=1)[0]
-                state_w_columnwise = w.max(dim=0)[0] # max value by column
+                state_w_columnwise = w.max(dim=0)[0] # max value by column (dim_in)
                 state_w_rowwise = w.max(dim=1)[0]
                 state_w_global = w.max()
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
                         x_int8,
                         w_int8.t(),
                         state_x_rowwise,
-                        state_w_columnwise,
+                        state_w_columnwise,  # TODO: state_w_rowwise
                         None,
                     ),
                     info,
@@ -148,7 +148,7 @@ if __name__ == "__main__":
                 print("TOTAL ROWWISE", time_rowwise)
                 print("TOTAL GLOBAL", time_global)
 
-                print("speedup", -100 * (time_global - time_standard) / time_standard)
+                print("speedup(%)", -100 * (time_global - time_standard) / time_standard)
 
                 info["time_standard"] = time_standard
                 info["time_rowwise"] = time_rowwise

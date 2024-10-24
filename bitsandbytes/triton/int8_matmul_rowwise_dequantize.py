@@ -136,8 +136,7 @@ else:
         w_factor = tl.load(state_w_ptr + rbn)[None, :]
         x_factor = tl.load(state_x_ptr + ram)[:, None]
 
-        # acc = tl.zeros((BLOCK_M, BLOCK_N), dtype=ACC_TYPE)
-        acc = tl.zeros((BLOCK_M, BLOCK_N), dtype=tl.int32)
+        acc = tl.zeros((BLOCK_M, BLOCK_N), dtype=ACC_TYPE)
         for k in range(0, tl.cdiv(K, BLOCK_K * SPLIT_K)):
             if EVEN_K:
                 a = tl.load(A)
@@ -183,7 +182,7 @@ else:
         # allocates output
         c = torch.empty((M, N), device=device, dtype=torch.float16)
         # accumulator types
-        ACC_TYPE = tl.float32  # if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
+        ACC_TYPE = tl.int32  # if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
         # launch int8_matmul_rowwise_dequantize kernel
         # SPLIT_K blocks process 1 output tile
         # if k dimension is large, use serveral blocks to process together
